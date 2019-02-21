@@ -6,8 +6,8 @@
 class Map
 {
 private:
-	int OLD_CELL_SIZE = 20;
-	int CELL_SIZE = 20;
+	float OLD_CELL_SIZE = 20;
+	float CELL_SIZE = 20;
 	const int MAP_DIMENSION = 100;
 
 	//Movement and Zoom

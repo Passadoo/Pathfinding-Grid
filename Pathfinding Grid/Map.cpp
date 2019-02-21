@@ -5,7 +5,7 @@
 Map::Map()
 {
 
-	mGroundTexture.loadFromFile("Assets/GroundTexture2.png");
+	mGroundTexture.loadFromFile("Assets/GroundTexture.png");
 	mObstacleTexture.loadFromFile("Assets/ObstacleTexture.png");
 	mStartTexture.loadFromFile("Assets/StartTexture.png");
 	mEndTexture.loadFromFile("Assets/EndTexture.png");
@@ -99,21 +99,7 @@ void Map::update(float dt)
 		{
 			for (int j = 0; j < MAP_DIMENSION; j++)
 			{
-				if (i == 0 && j == 0)
-				{
-				}
-				else if (i == 0)
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x, mCells[i][j].position.y + ZOOM_FACTOR * j * dt);
-				}
-				else if (j == 0)
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x + i * ZOOM_FACTOR * dt, mCells[i][j].position.y);
-				}
-				else
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x + i * ZOOM_FACTOR * dt, mCells[i][j].position.y + j * ZOOM_FACTOR * dt);
-				}
+				mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x + i * ZOOM_FACTOR * dt, mCells[i][j].position.y + j * ZOOM_FACTOR * dt);
 			}
 		}
 	}
@@ -125,21 +111,7 @@ void Map::update(float dt)
 		{
 			for (int j = 0; j < MAP_DIMENSION; j++)
 			{
-				if (i == 0 && j == 0)
-				{
-				}
-				else if (i == 0)
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x, mCells[i][j].position.y - ZOOM_FACTOR * j * dt);
-				}
-				else if (j == 0)
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x - i * ZOOM_FACTOR * dt, mCells[i][j].position.y);
-				}
-				else
-				{
-					mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x - i * ZOOM_FACTOR * dt, mCells[i][j].position.y - j * ZOOM_FACTOR * dt);
-				}
+				mCells[i][j].position = sf::Vector2f(mCells[i][j].position.x - i * ZOOM_FACTOR * dt, mCells[i][j].position.y - j * ZOOM_FACTOR * dt);
 			}
 		}
 	}
@@ -150,6 +122,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 {
 	sf::Vector2i windowPos = sf::Mouse::getPosition(window);
 
+	// Mouse input
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		float xValue = std::floor((float)(windowPos.x) / CELL_SIZE);
@@ -159,9 +132,9 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		int xIndex = 0;
 		int yIndex = 0;
 
-		for (int i = 0; i < MAP_DIMENSION - 1 && !found; i++)
+		for (int i = 0; i < MAP_DIMENSION && !found; i++)
 		{
-			if (mCells[i][0].position.x < windowPos.x && mCells[i + 1][0].position.x > windowPos.x)
+			if (mCells[i][0].position.x < windowPos.x && mCells[i][0].position.x + CELL_SIZE > windowPos.x)
 			{
 				found = true;
 				xIndex = i;
@@ -170,9 +143,9 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 		found = false;
 
-		for (int j = 0; j < MAP_DIMENSION - 1 && !found; j++)
+		for (int j = 0; j < MAP_DIMENSION && !found; j++)
 		{
-			if (mCells[0][j].position.y < windowPos.y && mCells[0][j + 1].position.y > windowPos.y)
+			if (mCells[0][j].position.y < windowPos.y && mCells[0][j].position.y + CELL_SIZE > windowPos.y)
 			{
 				found = true;
 				yIndex = j;
@@ -185,8 +158,8 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 void Map::Draw(sf::RenderWindow& window, sf::RenderStates states)
 {
-	float ratio = CELL_SIZE / OLD_CELL_SIZE;
-	mSprite.setScale(ratio, ratio);
+	float ratio = CELL_SIZE / std::max(OLD_CELL_SIZE, 0.001f);
+	mSprite.setScale(ratio / 3, ratio / 3);
 
 	for (int i = 0; i < MAP_DIMENSION; i++)
 	{
