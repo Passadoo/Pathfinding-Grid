@@ -13,10 +13,15 @@
     <ClCompile Include="Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PathFinding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="PathFinding.h" />
+    <ClInclude Include="Helper.h" />
   </ItemGroup>
 </Project>

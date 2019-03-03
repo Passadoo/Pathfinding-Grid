@@ -3,13 +3,12 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+#include "Helper.h"
+#include "PathFinding.h"
+
 class Map
 {
 private:
-	float OLD_CELL_SIZE = 20;
-	float CELL_SIZE = 20;
-	const int MAP_DIMENSION = 100;
-
 	//Movement and Zoom
 	const int ZOOM_FACTOR = 2;
 	const int MOVEMENT_FACTOR = 150;
@@ -20,21 +19,15 @@ private:
 	sf::Texture mEndTexture;
 	sf::Sprite mSprite;
 
-	enum CellType
-	{
-		eGround = 0,
-		eObstacle,
-		eStart,
-		eEnd
-	};
-
-	struct Cell
-	{
-		CellType type;
-		sf::Vector2f position;
-	};
-
-	Cell** mCells;
+	Grid mGrid;
+	Path path;
+	CellIndex start;
+	CellIndex end;
+	Cell* startCellOld = nullptr;
+	Cell* endCellOld = nullptr;
+	int hasStartEnd = 0; // 0 = false, 1 = start, 2 = end
+	bool mlDown = false;
+	bool mrDown = false;
 
 	bool mColorBool = true;
 
