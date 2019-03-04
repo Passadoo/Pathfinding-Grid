@@ -206,7 +206,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 void Map::Draw(sf::RenderWindow& window, sf::RenderStates states)
 {
-	float ratio = mGrid.cellSize / std::max(mGrid.cellOldSize, 0.001f);
+	float ratio = mGrid.cellSize / START_SIZE_OF_CELLS;
 	mSprite.setScale(ratio / 3, ratio / 3);
 
 	for (int i = 0; i < mGrid.size; i++)
@@ -253,5 +253,4 @@ void Map::Draw(sf::RenderWindow& window, sf::RenderStates states)
 			window.draw(mSprite, states);
 		}
 	}
-	mGrid.cellOldSize = mGrid.cellSize;
 }

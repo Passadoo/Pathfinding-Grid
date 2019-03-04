@@ -40,7 +40,6 @@ struct Grid
 {
 	int size = MAP_DIMENSION;
 	float cellSize = START_SIZE_OF_CELLS;
-	float cellOldSize = START_SIZE_OF_CELLS;
 	Cell** cells;
 
 	void cleanUp() 
