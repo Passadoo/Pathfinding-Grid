@@ -16,6 +16,8 @@ public:
 	PathFinding();
 	~PathFinding();
 
+	static Path computeDirectionBasedAStart(CellIndex startIndex, CellIndex endIndex, Grid grid);
+
 	static Path computeAStart(CellIndex startIndex, CellIndex endIndex, Grid grid);
 
 	static bool isValid(int x, int y, Grid grid) { //If our Node is an obstacle it is not valid

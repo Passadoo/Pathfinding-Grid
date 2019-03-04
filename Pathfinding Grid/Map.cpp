@@ -196,7 +196,8 @@ void Map::ProcessInput(sf::RenderWindow & window)
 			}
 		}
 		path.clear();
-		path = PathFinding::computeAStart(start, end, mGrid);
+		//path = PathFinding::computeAStart(start, end, mGrid);
+		path = PathFinding::computeDirectionBasedAStart(start, end, mGrid);
 	}
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{

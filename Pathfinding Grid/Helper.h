@@ -14,6 +14,19 @@ enum CellType
 	eEnd
 };
 
+enum Dir 
+{ 
+	eNONE, 
+	eLEFT, 
+	eLEFT_UP, 
+	eUP, 
+	eRIGHT_UP, 
+	eRIGHT, 
+	eRIGHT_DOWN, 
+	eDOWN, 
+	eLEFT_DOWN 
+};
+
 struct Cell
 {
 	float f = FLT_MAX;
@@ -21,6 +34,7 @@ struct Cell
 	float h = FLT_MAX;
 	int xindex = 0;
 	int yindex = 0;
+	Dir dir = eNONE;
 	int parentX = -1;
 	int parentY = -1;
 	CellType type;
