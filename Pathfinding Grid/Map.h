@@ -28,6 +28,8 @@ private:
 	int hasStartEnd = 0; // 0 = false, 1 = start, 2 = end
 	bool mlDown = false;
 	bool mrDown = false;
+	bool XDown = false;
+	bool DirBasedPathFinding = false;
 
 	bool mColorBool = true;
 

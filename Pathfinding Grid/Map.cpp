@@ -34,6 +34,7 @@ Map::Map()
 
 	std::cout << "Use Arrow keys to move" << std::endl;
 	std::cout << "Use the K and L keys to Zoom" << std::endl;
+	std::cout << "Useing normal A* pathfinding" << std::endl;
 }
 
 
@@ -196,12 +197,28 @@ void Map::ProcessInput(sf::RenderWindow & window)
 			}
 		}
 		path.clear();
-		//path = PathFinding::computeAStart(start, end, mGrid);
-		path = PathFinding::computeDirectionBasedAStart(start, end, mGrid);
+		if (DirBasedPathFinding)
+			path = PathFinding::computeDirectionBasedAStart(start, end, mGrid);
+		else
+			path = PathFinding::computeAStart(start, end, mGrid);
 	}
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{
 		mrDown = false;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && !XDown)
+	{
+		XDown = true;
+		DirBasedPathFinding = !DirBasedPathFinding;
+
+		if (DirBasedPathFinding)
+			std::cout << "Useing direction based A* pathfinding" << std::endl;
+		else
+			std::cout << "Useing normal A* pathfinding" << std::endl;
+	}
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	{
+		XDown = false;
 	}
 }
 
