@@ -193,9 +193,13 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		{
 			for (int j = 0; j < mGrid.size; j++)
 			{
-				mGrid.cells[i][j].type = CellType::eGround;
+				if (mGrid.cells[i][j].type == ePath)
+					mGrid.cells[i][j].type = eGround;
 			}
 		}
+
+		startCellOld->type = CellType::eStart;
+		endCellOld->type = CellType::eEnd;
 		path.clear();
 		if (DirBasedPathFinding)
 			path = PathFinding::computeDirectionBasedAStart(start, end, mGrid);
@@ -212,13 +216,47 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		DirBasedPathFinding = !DirBasedPathFinding;
 
 		if (DirBasedPathFinding)
-			std::cout << "Useing direction based A* pathfinding" << std::endl;
+			std::cout << "Using direction based A* pathfinding" << std::endl;
 		else
-			std::cout << "Useing normal A* pathfinding" << std::endl;
+			std::cout << "Using normal A* pathfinding" << std::endl;
 	}
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
 		XDown = false;
+	}
+
+
+	// Testing
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+	{
+		float xValue = std::floor((float)(windowPos.x) / mGrid.cellSize);
+		float yValue = std::floor((float)(windowPos.y) / mGrid.cellSize);
+
+		bool found = false;
+		int xIndex = 0;
+		int yIndex = 0;
+
+		for (int i = 0; i < mGrid.size && !found; i++)
+		{
+			if (mGrid.cells[i][0].position.x < windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize > windowPos.x)
+			{
+				found = true;
+				xIndex = i;
+			}
+		}
+
+		found = false;
+
+		for (int j = 0; j < mGrid.size && !found; j++)
+		{
+			if (mGrid.cells[0][j].position.y < windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize > windowPos.y)
+			{
+				found = true;
+				yIndex = j;
+			}
+		}
+
+		mGrid.cells[xIndex][yIndex].type = CellType::eObstacle;
 	}
 }
 
@@ -234,6 +272,18 @@ void Map::Draw(sf::RenderWindow& window, sf::RenderStates states)
 			Cell cell = mGrid.cells[i][j];
 			mSprite.setColor(sf::Color::White);
 			mSprite.setPosition(cell.position);
+
+			if (cell.debugType != eNoList)
+			{
+				if (cell.debugType == eOpen)
+				{
+					mSprite.setColor(sf::Color::Green);
+				}
+				if (cell.debugType == eClosed)
+				{
+					mSprite.setColor(sf::Color::Cyan);
+				}
+			}
 
 			if (cell.type == eGround)
 			{

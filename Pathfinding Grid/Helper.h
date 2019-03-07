@@ -11,6 +11,9 @@ enum CellType
 	ePath,
 	eObstacle,
 	eStart,
+	eOpen,
+	eClosed,
+	eNoList,
 	eEnd
 };
 
@@ -38,6 +41,7 @@ struct Cell
 	int parentX = -1;
 	int parentY = -1;
 	CellType type;
+	CellType debugType = CellType::eNoList;
 	sf::Vector2f position;
 };
 

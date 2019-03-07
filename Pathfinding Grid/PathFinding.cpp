@@ -24,6 +24,8 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 			grid.cells[i][j].dir = eNONE;
 			grid.cells[i][j].parentX = -1;
 			grid.cells[i][j].parentY = -1;
+
+			grid.cells[i][j].debugType = eNoList;
 		}
 	}
 
@@ -73,11 +75,12 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 	open.back().dir = eNONE;
 	open.back().parentX = startIndex.x;
 	open.back().parentY = startIndex.y;
+	open.back().debugType = eOpen;
 
 	bool destinationFound = false;
 
-	int x;
-	int y;
+	int x = startIndex.x;
+	int y = startIndex.y;
 
 	Cell& goal = grid.cells[endIndex.x][endIndex.y];
 	Cell cell;
@@ -85,13 +88,13 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 	while (!open.empty())
 	{
 		// Get the cell that is closest to the goal by looking at position and direction
-		x = startIndex.x;
-		y = startIndex.y;
+		bool first = true;
 		Path::iterator itCell;
 		for (Path::iterator it = open.begin(); it != open.end(); it = next(it)) {
 			Cell n = (*it);
-			if (x == startIndex.x && y == startIndex.y)
+			if (first)
 			{
+				first = false;
 				x = n.xindex;
 				y = n.yindex;
 				itCell = it;
@@ -123,10 +126,41 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 				itCell = it;
 			}
 		}
-		cell = *itCell;
+		cell = grid.cells[x][y];
 		open.erase(itCell);
 
+		grid.cells[x][y].debugType = eClosed;
 		closed[x][y] = true;
+
+		/*
+		//For each neighbour starting from North-West to South-East
+		for (int newX = -1; newX <= 1; newX++) {
+			for (int newY = -1; newY <= 1; newY++) {
+				if (newX != 0 && newY != 0)
+				if (isValid(x + newX, y + newY, grid)) {
+					if (isDestination(x + newX, y + newY, goal))
+					{
+						//Destination found - make path
+						grid.cells[x + newX][y + newY].parentX = x;
+						grid.cells[x + newX][y + newY].parentY = y;
+						destinationFound = true;
+						releaseClosed();
+						return makePath(grid, goal, startIndex);
+					}
+					else if (closed[x + newX][y + newY] == false)
+					{
+						// Check if this path is better than the one already present
+						//if (check)
+						{
+							// Update the details of this neighbour node
+							grid.cells[x + newX][y + newY].parentX = x;
+							grid.cells[x + newX][y + newY].parentY = y;
+							open.emplace_back(grid.cells[x + newX][y + newY]);
+						}
+					}
+				}
+			}
+		}*/
 
 		struct hvd {
 			int h = 0;
@@ -152,10 +186,10 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		if (cell.dir == eLEFT)directions.push_back(hvd(h, v, eLEFT));
 		if (cell.dir == eDOWN)directions.push_back(hvd(h, v, eDOWN));
 		if (cell.dir == eUP)directions.push_back(hvd(h, v, eUP));
-		if (h == 1 && v == 1) directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eDOWN));
-		if (h == -1 && v == -1) directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eUP));
-		if (h == -1 && v == 1) directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eDOWN));
-		if (h == 1 && v == -1) directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eUP));
+		if (h == 1 && v == 1) { directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eDOWN)); }
+		if (h == -1 && v == -1) { directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eUP)); }
+		if (h == -1 && v == 1) { directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eDOWN)); }
+		if (h == 1 && v == -1) { directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eUP)); }
 
 		int notfree = 0;
 		for (hvd& hvd : directions)
@@ -176,6 +210,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 					// Update the details of this neighbour node
 					grid.cells[x + hvd.h][y + hvd.v].parentX = x;
 					grid.cells[x + hvd.h][y + hvd.v].parentY = y;
+					grid.cells[x + hvd.h][y + hvd.v].debugType = eOpen;
 					open.emplace_back(grid.cells[x + hvd.h][y + hvd.v]);
 				}
 			}
@@ -185,8 +220,32 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		// None side is free, change dir
 		if (notfree == directions.size())
 		{
-			changeKey(grid, x, y);
-			open.emplace_back(grid.cells[x][y]);
+			//changeKey(grid, x, y);
+			//open.emplace_back(grid.cells[x][y]);
+
+			for (int newX = -1; newX <= 1; newX++) {
+				for (int newY = -1; newY <= 1; newY++) {
+					if (!(newX == 0 && newY == 0))
+						if (isValid(x + newX, y + newY, grid)) {
+							if (isDestination(x + newX, y + newY, goal))
+							{
+								//Destination found - make path
+								grid.cells[x + newX][y + newY].parentX = x;
+								grid.cells[x + newX][y + newY].parentY = y;
+								destinationFound = true;
+								releaseClosed();
+								return makePath(grid, goal, startIndex);
+							}
+							else if (closed[x + newX][y + newY] == false)
+							{
+								// Update the details of this neighbour node
+								grid.cells[x + newX][y + newY].parentX = x;
+								grid.cells[x + newX][y + newY].parentY = y;
+								open.emplace_back(grid.cells[x + newX][y + newY]);
+							}
+						}
+				}
+			}
 		}
 	}
 
@@ -212,6 +271,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 			grid.cells[i][j].h = FLT_MAX;
 			grid.cells[i][j].parentX = -1;
 			grid.cells[i][j].parentY = -1;
+			grid.cells[i][j].debugType = eNoList;
 		}
 	}
 
@@ -222,6 +282,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 	open.back().h = 0;
 	open.back().parentX = startIndex.x;
 	open.back().parentY = startIndex.y;
+	open.back().debugType = eOpen;
 
 	bool destinationFound = false;
 
@@ -252,11 +313,12 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 		x = cell.xindex;
 		y = cell.yindex;
 		closed[x][y] = true;
+		grid.cells[x][y].debugType = eClosed;
 
 		//For each neighbour starting from North-West to South-East
 		for (int newX = -1; newX <= 1; newX++) {
 			for (int newY = -1; newY <= 1; newY++) {
-				double gNew, hNew, fNew;
+				float gNew, hNew, fNew;
 				if (isValid(x + newX, y + newY, grid)) {
 					if (isDestination(x + newX, y + newY, dest))
 					{
@@ -289,6 +351,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 							grid.cells[x + newX][y + newY].h = hNew;
 							grid.cells[x + newX][y + newY].parentX = x;
 							grid.cells[x + newX][y + newY].parentY = y;
+							grid.cells[x + newX][y + newY].debugType = eClosed;
 							open.emplace_back(grid.cells[x + newX][y + newY]);
 						}
 					}
