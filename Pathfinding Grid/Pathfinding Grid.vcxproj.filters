@@ -16,6 +16,9 @@
     <ClCompile Include="PathFinding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MapLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -23,5 +26,6 @@
     </ClInclude>
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="MapLoader.h" />
   </ItemGroup>
 </Project>

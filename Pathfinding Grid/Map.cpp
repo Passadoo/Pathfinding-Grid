@@ -1,7 +1,5 @@
 #include "Map.h"
 
-
-
 Map::Map()
 {
 
@@ -12,25 +10,8 @@ Map::Map()
 
 	//mSprite.scale(0.25f, 0.25f);
 
-	//Create the 2 dimensional array
-	mGrid.cells = new Cell*[mGrid.size];
-
-	for (int i = 0; i < mGrid.size; i++)
-	{
-		mGrid.cells[i] = new Cell[mGrid.size];
-	}
-
-	//Fill the array with ground tiles
-	for (int i = 0; i < mGrid.size; i++)
-	{
-		for (int j = 0; j < mGrid.size; j++)
-		{
-			mGrid.cells[i][j].xindex = i;
-			mGrid.cells[i][j].yindex = j;
-			mGrid.cells[i][j].position = sf::Vector2f(mGrid.cellSize * i, mGrid.cellSize * j);
-			mGrid.cells[i][j].type = eGround;
-		}
-	}
+	// Load map
+	MapLoader::loadMap(mGrid, "Assets/map0.png");
 
 	std::cout << "Use Arrow keys to move" << std::endl;
 	std::cout << "Use the K and L keys to Zoom" << std::endl;
@@ -48,9 +29,9 @@ void Map::update(float dt)
 	//MOVE FACTOR
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x - MOVEMENT_FACTOR * dt, mGrid.cells[i][j].position.y);
 			}
@@ -58,9 +39,9 @@ void Map::update(float dt)
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x + MOVEMENT_FACTOR * dt, mGrid.cells[i][j].position.y);
 			}
@@ -69,9 +50,9 @@ void Map::update(float dt)
 	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x, mGrid.cells[i][j].position.y - MOVEMENT_FACTOR * dt);
 			}
@@ -79,9 +60,9 @@ void Map::update(float dt)
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x, mGrid.cells[i][j].position.y + MOVEMENT_FACTOR * dt);
 			}
@@ -93,9 +74,9 @@ void Map::update(float dt)
 	{
 		mGrid.cellSize = mGrid.cellSize + ZOOM_FACTOR * dt;
 
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x + i * ZOOM_FACTOR * dt, mGrid.cells[i][j].position.y + j * ZOOM_FACTOR * dt);
 			}
@@ -105,9 +86,9 @@ void Map::update(float dt)
 	{
 		mGrid.cellSize = mGrid.cellSize - ZOOM_FACTOR * dt;
 
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				mGrid.cells[i][j].position = sf::Vector2f(mGrid.cells[i][j].position.x - i * ZOOM_FACTOR * dt, mGrid.cells[i][j].position.y - j * ZOOM_FACTOR * dt);
 			}
@@ -131,7 +112,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		int xIndex = 0;
 		int yIndex = 0;
 
-		for (int i = 0; i < mGrid.size && !found; i++)
+		for (int i = 0; i < mGrid.width && !found; i++)
 		{
 			if (mGrid.cells[i][0].position.x <= windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize >= windowPos.x)
 			{
@@ -142,7 +123,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 		found = false;
 
-		for (int j = 0; j < mGrid.size && !found; j++)
+		for (int j = 0; j < mGrid.height && !found; j++)
 		{
 			if (mGrid.cells[0][j].position.y <= windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize >= windowPos.y)
 			{
@@ -189,9 +170,9 @@ void Map::ProcessInput(sf::RenderWindow & window)
 	{
 		mrDown = true;
 		std::cout << "compute path" << std::endl;
-		for (int i = 0; i < mGrid.size; i++)
+		for (int i = 0; i < mGrid.width; i++)
 		{
-			for (int j = 0; j < mGrid.size; j++)
+			for (int j = 0; j < mGrid.height; j++)
 			{
 				if (mGrid.cells[i][j].type == ePath)
 					mGrid.cells[i][j].type = eGround;
@@ -236,9 +217,9 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		int xIndex = 0;
 		int yIndex = 0;
 
-		for (int i = 0; i < mGrid.size && !found; i++)
+		for (int i = 0; i < mGrid.width && !found; i++)
 		{
-			if (mGrid.cells[i][0].position.x < windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize > windowPos.x)
+			if (mGrid.cells[i][0].position.x <= windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize >= windowPos.x)
 			{
 				found = true;
 				xIndex = i;
@@ -247,9 +228,9 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 		found = false;
 
-		for (int j = 0; j < mGrid.size && !found; j++)
+		for (int j = 0; j < mGrid.height && !found; j++)
 		{
-			if (mGrid.cells[0][j].position.y < windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize > windowPos.y)
+			if (mGrid.cells[0][j].position.y <= windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize >= windowPos.y)
 			{
 				found = true;
 				yIndex = j;
@@ -265,9 +246,9 @@ void Map::Draw(sf::RenderWindow& window, sf::RenderStates states)
 	float ratio = mGrid.cellSize / START_SIZE_OF_CELLS;
 	mSprite.setScale(ratio / 3, ratio / 3);
 
-	for (int i = 0; i < mGrid.size; i++)
+	for (int i = 0; i < mGrid.width; i++)
 	{
-		for (int j = 0; j < mGrid.size; j++)
+		for (int j = 0; j < mGrid.height; j++)
 		{
 			Cell cell = mGrid.cells[i][j];
 			mSprite.setColor(sf::Color::White);

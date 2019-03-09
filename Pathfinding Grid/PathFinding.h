@@ -21,8 +21,8 @@ public:
 	static Path computeAStart(CellIndex startIndex, CellIndex endIndex, Grid grid);
 
 	static bool isValid(int x, int y, Grid grid) { //If our Node is an obstacle it is not valid
-		int id = x + y * grid.size;
-		if (x < 0 || y < 0 || x >= grid.size || y >= grid.size) {
+		int id = x + y * grid.width;
+		if (x < 0 || y < 0 || x >= grid.width || y >= grid.height) {
 			return false;
 		}
 		if (grid.getCell(id).type != CellType::eObstacle) {

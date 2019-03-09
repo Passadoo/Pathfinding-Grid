@@ -56,13 +56,14 @@ struct CellIndex
 
 struct Grid
 {
-	int size = MAP_DIMENSION;
+	int width = MAP_DIMENSION;
+	int height = MAP_DIMENSION;
 	float cellSize = START_SIZE_OF_CELLS;
 	Cell** cells;
 
 	void cleanUp() 
 	{
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < height; i++)
 		{
 			delete[] cells[i];
 		}
@@ -72,8 +73,8 @@ struct Grid
 
 	Cell& getCell(int cellIndex)
 	{
-		int x = cellIndex % size;
-		int y = (int)std::floor(cellIndex / size);
+		int x = cellIndex % width;
+		int y = (int)std::floor(cellIndex / height);
 		return cells[x][y];
 	};
 

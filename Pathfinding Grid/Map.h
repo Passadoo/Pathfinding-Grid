@@ -5,6 +5,7 @@
 
 #include "Helper.h"
 #include "PathFinding.h"
+#include "MapLoader.h"
 
 class Map
 {

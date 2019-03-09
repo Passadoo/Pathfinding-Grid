@@ -14,11 +14,11 @@ PathFinding::~PathFinding()
 Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex endIndex, Grid grid)
 {
 	// Init closed list
-	bool** closed = new bool*[grid.size];
-	for (int i = 0; i < grid.size; i++)
+	bool** closed = new bool*[grid.width];
+	for (int i = 0; i < grid.width; i++)
 	{
-		closed[i] = new bool[grid.size];
-		for (int j = 0; j < grid.size; j++)
+		closed[i] = new bool[grid.height];
+		for (int j = 0; j < grid.height; j++)
 		{
 			closed[i][j] = false;
 			grid.cells[i][j].h = FLT_MAX;
@@ -32,7 +32,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 
 	// Function to delete closed list
 	auto releaseClosed = [closed, grid]() {
-		for (int i = 0; i < grid.size; i++)
+		for (int i = 0; i < grid.height; i++)
 		{
 			delete[] closed[i];
 		}
@@ -274,11 +274,11 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 {
 	// Initialize both open and closed list
 	std::vector<Cell> open;
-	bool** closed = new bool*[grid.size];
-	for (int i = 0; i < grid.size; i++)
+	bool** closed = new bool*[grid.width];
+	for (int i = 0; i < grid.width; i++)
 	{
-		closed[i] = new bool[grid.size];
-		for (int j = 0; j < grid.size; j++)
+		closed[i] = new bool[grid.height];
+		for (int j = 0; j < grid.height; j++)
 		{
 			closed[i][j] = false;
 			grid.cells[i][j].f = FLT_MAX;
@@ -342,7 +342,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 						grid.cells[x + newX][y + newY].parentY = y;
 						destinationFound = true;
 
-						for (int i = 0; i < grid.size; i++)
+						for (int i = 0; i < grid.height; i++)
 						{
 							delete[] closed[i];
 						}
@@ -375,7 +375,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 		}
 	}
 
-	for (int i = 0; i < grid.size; i++)
+	for (int i = 0; i < grid.height; i++)
 	{
 		delete[] closed[i];
 	}
