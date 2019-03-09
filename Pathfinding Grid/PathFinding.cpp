@@ -366,7 +366,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 							grid.cells[x + newX][y + newY].h = hNew;
 							grid.cells[x + newX][y + newY].parentX = x;
 							grid.cells[x + newX][y + newY].parentY = y;
-							grid.cells[x + newX][y + newY].debugType = eClosed;
+							grid.cells[x + newX][y + newY].debugType = eOpen;
 							open.emplace_back(grid.cells[x + newX][y + newY]);
 						}
 					}
