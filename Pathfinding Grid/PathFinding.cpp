@@ -21,6 +21,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		for (int j = 0; j < grid.size; j++)
 		{
 			closed[i][j] = false;
+			grid.cells[i][j].h = FLT_MAX;
 			grid.cells[i][j].dir = eNONE;
 			grid.cells[i][j].parentX = -1;
 			grid.cells[i][j].parentY = -1;
@@ -67,15 +68,63 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		if (cell.dir == eRIGHT_UP) { cell.dir = eLEFT_DOWN; return; }
 	};
 
+	auto check = [=](int oldx, int oldy, int x, int y, Grid grid) -> bool
+	{
+		bool checked = false;
+		Cell& cell = grid.cells[x][y];
+		switch (cell.dir)
+		{
+		case eLEFT:
+			if (x < oldx)
+				checked = true;
+			break;
+		case eRIGHT:
+			if (x > oldx)
+				checked = true;
+			break;
+		case eUP:
+			if (y < oldy)
+				checked = true;
+			break;
+		case eDOWN:
+			if (y > oldy)
+				checked = true;
+			break;
+
+		case eLEFT_UP:
+			if (x <= oldx && y <= oldy)
+				checked = true;
+			break;
+		case eRIGHT_UP:
+			if (x >= oldx && y <= oldy)
+				checked = true;
+			break;
+		case eRIGHT_DOWN:
+			if (x >= oldx && y >= oldy)
+				checked = true;
+			break;
+		case eLEFT_DOWN:
+			if (x <= oldx && y >= oldy)
+				checked = true;
+			break;
+		default:
+			break;
+		}
+
+		return checked;
+	};
+
 	// Init open list
 	std::vector<Cell> open;
 
 	// Add the start node
 	open.push_back(grid.cells[startIndex.x][startIndex.y]);
+	open.back().h = 0;
 	open.back().dir = eNONE;
 	open.back().parentX = startIndex.x;
 	open.back().parentY = startIndex.y;
 	open.back().debugType = eOpen;
+	setDir(endIndex.x, endIndex.y, open.back().xindex, open.back().yindex, grid);
 
 	bool destinationFound = false;
 
@@ -88,7 +137,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 	while (!open.empty())
 	{
 		// Get the cell that is closest to the goal by looking at position and direction
-		bool first = true;
+		/*bool first = true;
 		Path::iterator itCell;
 		for (Path::iterator it = open.begin(); it != open.end(); it = next(it)) {
 			Cell n = (*it);
@@ -125,12 +174,68 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 				y = n.yindex;
 				itCell = it;
 			}
+		}*/
+
+		float temp = FLT_MAX;
+		Path::iterator itCell;
+		for (Path::iterator it = open.begin(); it != open.end(); it = next(it)) {
+			Cell n = (*it);
+			if (n.h < temp)
+			{
+				temp = n.h;
+				x = n.xindex;
+				y = n.yindex;
+				itCell = it;
+			}
 		}
+
 		cell = grid.cells[x][y];
 		open.erase(itCell);
 
+		/*x = open.at(0).xindex;
+		y = open.at(0).yindex;
+		cell = grid.cells[x][y];
+		open.erase(open.begin());*/
+
 		grid.cells[x][y].debugType = eClosed;
 		closed[x][y] = true;
+
+		//For each neighbour starting from North-West to South-East
+		for (int newX = -1; newX <= 1; newX++) {
+			for (int newY = -1; newY <= 1; newY++) {
+				float ox = x, oy = y;
+				//if (!(newX == 0 && newY == 0))
+					if (isValid(x + newX, y + newY, grid)) {
+						if (isDestination(x + newX, y + newY, goal))
+						{
+							//Destination found - make path
+							grid.cells[x + newX][y + newY].parentX = x;
+							grid.cells[x + newX][y + newY].parentY = y;
+							destinationFound = true;
+							releaseClosed();
+							return makePath(grid, goal, startIndex);
+						}
+						else if (closed[x + newX][y + newY] == false)
+						{
+							// Check if this path is better than the one already present
+							if (grid.cells[x + newX][y + newY].h == FLT_MAX)
+							{
+								setDir(endIndex.x, endIndex.y, grid.cells[x + newX][y + newY].xindex, grid.cells[x + newX][y + newY].yindex, grid);
+								{
+									grid.cells[x + newX][y + newY].h = calculateH(x + newX, y + newY, goal);
+									ox = x + newX;
+									oy = y + newY;
+									// Update the details of this neighbour node
+									grid.cells[x + newX][y + newY].parentX = x;
+									grid.cells[x + newX][y + newY].parentY = y;
+									grid.cells[x + newX][y + newY].debugType = eOpen;
+									open.emplace_back(grid.cells[x + newX][y + newY]);
+								}
+							}
+						}
+					}
+			}
+		}
 
 		/*
 		//For each neighbour starting from North-West to South-East
@@ -155,6 +260,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 							// Update the details of this neighbour node
 							grid.cells[x + newX][y + newY].parentX = x;
 							grid.cells[x + newX][y + newY].parentY = y;
+							grid.cells[x + newX][y + newY].debugType = eOpen;
 							open.emplace_back(grid.cells[x + newX][y + newY]);
 						}
 					}
@@ -162,6 +268,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 			}
 		}*/
 
+		/*
 		struct hvd {
 			int h = 0;
 			int v = 0;
@@ -241,12 +348,13 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 								// Update the details of this neighbour node
 								grid.cells[x + newX][y + newY].parentX = x;
 								grid.cells[x + newX][y + newY].parentY = y;
+								grid.cells[x + newX][y + newY].debugType = eOpen;
 								open.emplace_back(grid.cells[x + newX][y + newY]);
 							}
 						}
 				}
 			}
-		}
+		}*/
 	}
 
 	releaseClosed();
