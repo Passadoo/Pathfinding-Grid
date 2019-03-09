@@ -10,7 +10,7 @@ class Map
 {
 private:
 	//Movement and Zoom
-	const int ZOOM_FACTOR = 2;
+	const float ZOOM_FACTOR = 2.0f;
 	const int MOVEMENT_FACTOR = 150;
 
 	sf::Texture mGroundTexture;

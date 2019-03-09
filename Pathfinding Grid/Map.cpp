@@ -133,7 +133,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 		for (int i = 0; i < mGrid.size && !found; i++)
 		{
-			if (mGrid.cells[i][0].position.x < windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize > windowPos.x)
+			if (mGrid.cells[i][0].position.x <= windowPos.x && mGrid.cells[i][0].position.x + mGrid.cellSize >= windowPos.x)
 			{
 				found = true;
 				xIndex = i;
@@ -144,7 +144,7 @@ void Map::ProcessInput(sf::RenderWindow & window)
 
 		for (int j = 0; j < mGrid.size && !found; j++)
 		{
-			if (mGrid.cells[0][j].position.y < windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize > windowPos.y)
+			if (mGrid.cells[0][j].position.y <= windowPos.y && mGrid.cells[0][j].position.y + mGrid.cellSize >= windowPos.y)
 			{
 				found = true;
 				yIndex = j;
