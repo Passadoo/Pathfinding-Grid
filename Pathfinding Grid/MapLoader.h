@@ -13,4 +13,5 @@ public:
 	~MapLoader();
 
 	static void loadMap(Grid& grid, const std::string& path);
+	static void setZoomFactor(Grid& grid);
 };

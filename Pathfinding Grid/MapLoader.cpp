@@ -40,3 +40,22 @@ void MapLoader::loadMap(Grid & grid, const std::string & path)
 		}
 	}
 }
+
+void MapLoader::setZoomFactor(Grid & grid)
+{
+	int x = grid.width - 1;
+	float zoomFactorX = (sf::VideoMode::getDesktopMode().width - grid.cells[x][0].position.x) / -x;
+	int y = grid.height - 1;
+	float zoomFactorY = (sf::VideoMode::getDesktopMode().height - grid.cells[0][y].position.y) / -y;
+
+	float zoomFactor = (zoomFactorX > zoomFactorY? zoomFactorX: zoomFactorY);
+	grid.cellSize = grid.cellSize - zoomFactor;
+
+	for (int i = 0; i < grid.width; i++)
+	{
+		for (int j = 0; j < grid.height; j++)
+		{
+			grid.cells[i][j].position = sf::Vector2f(grid.cells[i][j].position.x - i * zoomFactor, grid.cells[i][j].position.y - j * zoomFactor);
+		}
+	}
+}

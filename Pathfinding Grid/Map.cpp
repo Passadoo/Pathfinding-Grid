@@ -13,6 +13,8 @@ Map::Map()
 	// Load map
 	MapLoader::loadMap(mGrid, "Assets/map0.png");
 
+	MapLoader::setZoomFactor(mGrid);
+
 	std::cout << "Use Arrow keys to move" << std::endl;
 	std::cout << "Use the K and L keys to Zoom" << std::endl;
 	std::cout << "Using normal A* pathfinding" << std::endl;
