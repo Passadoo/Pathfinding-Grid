@@ -75,19 +75,19 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		switch (cell.dir)
 		{
 		case eLEFT:
-			if (x < oldx)
+			if (x <= oldx)
 				checked = true;
 			break;
 		case eRIGHT:
-			if (x > oldx)
+			if (x >= oldx)
 				checked = true;
 			break;
 		case eUP:
-			if (y < oldy)
+			if (y <= oldy)
 				checked = true;
 			break;
 		case eDOWN:
-			if (y > oldy)
+			if (y >= oldy)
 				checked = true;
 			break;
 
@@ -108,6 +108,7 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 				checked = true;
 			break;
 		default:
+			std::cout << "dir = eNONE" << std::endl;
 			break;
 		}
 
@@ -138,58 +139,18 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 	{
 		// Test with only direction
 		// Get the cell that is closest to the goal by looking at position and direction
-		bool first = true;
-		Path::iterator itCell;
+		Path::iterator itCell = open.begin();
+		bool first = false;
 		for (Path::iterator it = open.begin(); it != open.end(); it = next(it)) {
 			Cell n = (*it);
-			if (first)
+			if (check(x, y, n.xindex, n.yindex, grid) || !first)
 			{
-				first = false;
-				x = n.xindex;
-				y = n.yindex;
-				itCell = it;
-			}
-			Dir dir = grid.cells[n.xindex][n.yindex].dir;
-			if (dir == eNONE)
-			{
-				setDir(endIndex.x, endIndex.y, n.xindex, n.yindex, grid);
-				dir = grid.cells[n.xindex][n.yindex].dir;
-			}
-			bool set = false;
-			switch (dir)
-			{
-			case eLEFT: if (n.xindex < x) set = true; break;
-			case eLEFT_UP: if (n.xindex < x && n.yindex < y) set = true; break;
-			case eUP: if (n.yindex < y) set = true; break;
-			case eRIGHT_UP: if (n.xindex > x && n.yindex < y) set = true; break;
-			case eRIGHT: if (n.xindex > x) set = true; break;
-			case eRIGHT_DOWN: if (n.xindex > x && n.yindex > y) set = true; break;
-			case eDOWN: if (n.yindex > y) set = true; break;
-			case eLEFT_DOWN: if (n.xindex < x && n.yindex > y) set = true; break;
-			default:
-				break;
-			}
-			if (set)
-			{
+				first = true;
 				x = n.xindex;
 				y = n.yindex;
 				itCell = it;
 			}
 		}
-
-		// Test with only calculateH and not direction
-		/*float temp = FLT_MAX;
-		Path::iterator itCell;
-		for (Path::iterator it = open.begin(); it != open.end(); it = next(it)) {
-			Cell n = (*it);
-			if (n.h < temp)
-			{
-				temp = n.h;
-				x = n.xindex;
-				y = n.yindex;
-				itCell = it;
-			}
-		}*/
 
 		// Test with only direction
 		cell = grid.cells[x][y];
@@ -204,48 +165,8 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		grid.cells[x][y].debugType = eClosed;
 		closed[x][y] = true;
 
-		// Test with only calculateH and not direction
-		//For each neighbour starting from North-West to South-East
-		/*for (int newX = -1; newX <= 1; newX++) {
-			for (int newY = -1; newY <= 1; newY++) {
-				float ox = x, oy = y;
-				//if (!(newX == 0 && newY == 0))
-					if (isValid(x + newX, y + newY, grid)) {
-						if (isDestination(x + newX, y + newY, goal))
-						{
-							//Destination found - make path
-							grid.cells[x + newX][y + newY].parentX = x;
-							grid.cells[x + newX][y + newY].parentY = y;
-							destinationFound = true;
-							releaseClosed();
-							return makePath(grid, goal, startIndex);
-						}
-						else if (closed[x + newX][y + newY] == false)
-						{
-							// Check if this path is better than the one already present
-							if (grid.cells[x + newX][y + newY].h == FLT_MAX)
-							{
-								setDir(endIndex.x, endIndex.y, grid.cells[x + newX][y + newY].xindex, grid.cells[x + newX][y + newY].yindex, grid);
-								{
-									grid.cells[x + newX][y + newY].h = calculateH(x + newX, y + newY, goal);
-									ox = x + newX;
-									oy = y + newY;
-									// Update the details of this neighbour node
-									grid.cells[x + newX][y + newY].parentX = x;
-									grid.cells[x + newX][y + newY].parentY = y;
-									grid.cells[x + newX][y + newY].debugType = eOpen;
-									open.emplace_back(grid.cells[x + newX][y + newY]);
-								}
-							}
-						}
-					}
-			}
-		}*/
-
-		
-
 		// Test with only direction
-		struct hvd {
+		/*struct hvd {
 			int h = 0;
 			int v = 0;
 			Dir dir = eNONE;
@@ -290,18 +211,23 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 				}
 				else if (closed[x + hvd.h][y + hvd.v] == false)
 				{
-					// Update the details of this neighbour node
-					grid.cells[x + hvd.h][y + hvd.v].parentX = x;
-					grid.cells[x + hvd.h][y + hvd.v].parentY = y;
-					grid.cells[x + hvd.h][y + hvd.v].debugType = eOpen;
-					open.emplace_back(grid.cells[x + hvd.h][y + hvd.v]);
+					if (grid.cells[x + hvd.h][y + hvd.v].dir == eNONE)
+					{
+						// Set dir
+						setDir(endIndex.x, endIndex.y, x + hvd.h, y + hvd.v, grid);
+						// Update the details of this neighbour node
+						grid.cells[x + hvd.h][y + hvd.v].parentX = x;
+						grid.cells[x + hvd.h][y + hvd.v].parentY = y;
+						grid.cells[x + hvd.h][y + hvd.v].debugType = eOpen;
+						open.emplace_back(grid.cells[x + hvd.h][y + hvd.v]);
+					}
 				}
 			}
 			else
 				notfree++;
-		}
+		}*/
 		// None side is free, change dir
-		if (notfree == directions.size())
+		//if (notfree == directions.size())
 		{
 			//changeKey(grid, x, y);
 			//open.emplace_back(grid.cells[x][y]);
@@ -321,11 +247,16 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 							}
 							else if (closed[x + newX][y + newY] == false)
 							{
-								// Update the details of this neighbour node
-								grid.cells[x + newX][y + newY].parentX = x;
-								grid.cells[x + newX][y + newY].parentY = y;
-								grid.cells[x + newX][y + newY].debugType = eOpen;
-								open.emplace_back(grid.cells[x + newX][y + newY]);
+								if (grid.cells[x + newX][y + newY].dir == eNONE)
+								{
+									// Set dir
+									setDir(endIndex.x, endIndex.y, x + newX, y + newY, grid);
+									// Update the details of this neighbour node
+									grid.cells[x + newX][y + newY].parentX = x;
+									grid.cells[x + newX][y + newY].parentY = y;
+									grid.cells[x + newX][y + newY].debugType = eOpen;
+									open.emplace_back(grid.cells[x + newX][y + newY]);
+								}
 							}
 						}
 				}
