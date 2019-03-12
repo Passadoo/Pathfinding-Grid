@@ -13,6 +13,18 @@ PathFinding::~PathFinding()
 
 Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex endIndex, Grid grid)
 {
+	if (isValid(endIndex.x, endIndex.y, grid) == false)
+	{
+		std::cout << "Destination is an obstacle" << std::endl;
+		return Path();
+	}
+
+	if (isDestination(startIndex.x, startIndex.y, grid.cells[endIndex.x][endIndex.y]))
+	{
+		std::cout << "Start node is the destination" << std::endl;
+		return Path();
+	}
+
 	// Init closed list
 	bool** closed = new bool*[grid.width];
 	for (int i = 0; i < grid.width; i++)
@@ -177,6 +189,18 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 
 Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid grid)
 {
+	if (isValid(endIndex.x, endIndex.y, grid) == false)
+	{
+		std::cout << "Destination is an obstacle" << std::endl;
+		return Path();
+	}
+
+	if (isDestination(startIndex.x, startIndex.y, grid.cells[endIndex.x][endIndex.y]))
+	{
+		std::cout << "Start node is the destination" << std::endl;
+		return Path();
+	}
+
 	// Initialize both open and closed list
 	std::vector<Cell> open;
 	bool** closed = new bool*[grid.width];

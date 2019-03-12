@@ -25,7 +25,7 @@ public:
 		if (x < 0 || y < 0 || x >= grid.width || y >= grid.height) {
 			return false;
 		}
-		if (grid.getCell(id).type != CellType::eObstacle) {
+		if (grid.cells[x][y].type != CellType::eObstacle) {
 			return true;
 		}
 		return false;
