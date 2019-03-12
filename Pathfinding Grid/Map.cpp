@@ -184,10 +184,14 @@ void Map::ProcessInput(sf::RenderWindow & window)
 		startCellOld->type = CellType::eStart;
 		endCellOld->type = CellType::eEnd;
 		path.clear();
+		std::chrono::high_resolution_clock clock;
+		auto oldTime = clock.now();
 		if (DirBasedPathFinding)
 			path = PathFinding::computeDirectionBasedAStart(start, end, mGrid);
 		else
 			path = PathFinding::computeAStart(start, end, mGrid);
+		double time = std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - oldTime).count();
+		std::cout << "time: " << time << " ms" << std::endl;
 	}
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{

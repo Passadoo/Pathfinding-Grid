@@ -21,7 +21,6 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		for (int j = 0; j < grid.height; j++)
 		{
 			closed[i][j] = false;
-			grid.cells[i][j].h = FLT_MAX;
 			grid.cells[i][j].dir = eNONE;
 			grid.cells[i][j].parentX = -1;
 			grid.cells[i][j].parentY = -1;
@@ -52,20 +51,6 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 		if (h == -1 && v == -1) grid.cells[x][y].dir = Dir::eLEFT_UP;
 		if (h == -1 && v == 1) grid.cells[x][y].dir = Dir::eLEFT_DOWN;
 		if (h == 1 && v == -1) grid.cells[x][y].dir = Dir::eRIGHT_UP;
-	};
-
-	// Change dir to 
-	auto changeKey = [=](Grid grid, int x, int y)
-	{
-		Cell& cell = grid.cells[x][y];
-		if (cell.dir == eLEFT) { cell.dir = eRIGHT; return; }
-		if (cell.dir == eRIGHT) { cell.dir = eLEFT; return; }
-		if (cell.dir == eUP) { cell.dir = eDOWN; return; }
-		if (cell.dir == eDOWN) { cell.dir = eUP; return; }
-		if (cell.dir == eRIGHT_DOWN) { cell.dir = eLEFT_UP; return; }
-		if (cell.dir == eLEFT_UP) { cell.dir = eRIGHT_DOWN; return; }
-		if (cell.dir == eLEFT_DOWN) { cell.dir = eRIGHT_UP; return; }
-		if (cell.dir == eRIGHT_UP) { cell.dir = eLEFT_DOWN; return; }
 	};
 
 	auto check = [=](int oldx, int oldy, int x, int y, Grid grid) -> bool
@@ -120,14 +105,10 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 
 	// Add the start node
 	open.push_back(grid.cells[startIndex.x][startIndex.y]);
-	open.back().h = 0;
-	open.back().dir = eNONE;
 	open.back().parentX = startIndex.x;
 	open.back().parentY = startIndex.y;
 	open.back().debugType = eOpen;
 	setDir(endIndex.x, endIndex.y, open.back().xindex, open.back().yindex, grid);
-
-	bool destinationFound = false;
 
 	int x = startIndex.x;
 	int y = startIndex.y;
@@ -152,114 +133,38 @@ Path PathFinding::computeDirectionBasedAStart(CellIndex startIndex, CellIndex en
 			}
 		}
 
-		// Test with only direction
 		cell = grid.cells[x][y];
 		open.erase(itCell);
-
-		// Test with only direction
-		/*x = open.at(0).xindex;
-		y = open.at(0).yindex;
-		cell = grid.cells[x][y];
-		open.erase(open.begin());*/
 
 		grid.cells[x][y].debugType = eClosed;
 		closed[x][y] = true;
 
-		// Test with only direction
-		/*struct hvd {
-			int h = 0;
-			int v = 0;
-			Dir dir = eNONE;
-			hvd(int h, int v, Dir dir)
-			{
-				this->h = h;
-				this->v = v;
-				this->dir = dir;
-			};
-		};
-
-		int h = 0;
-		int v = 0;
-		if (endIndex.x < x) { h = -1; }
-		if (endIndex.x > x) { h = 1; }
-		if (endIndex.y < y) { v = -1; }
-		if (endIndex.y > y) { v = 1; }
-
-		std::vector<hvd> directions;
-		if (cell.dir == eRIGHT)directions.push_back(hvd(h, v, eRIGHT));
-		if (cell.dir == eLEFT)directions.push_back(hvd(h, v, eLEFT));
-		if (cell.dir == eDOWN)directions.push_back(hvd(h, v, eDOWN));
-		if (cell.dir == eUP)directions.push_back(hvd(h, v, eUP));
-		if (h == 1 && v == 1) { directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eDOWN)); }
-		if (h == -1 && v == -1) { directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eUP)); }
-		if (h == -1 && v == 1) { directions.push_back(hvd(h, v, eLEFT)); directions.push_back(hvd(h, v, eDOWN)); }
-		if (h == 1 && v == -1) { directions.push_back(hvd(h, v, eRIGHT)); directions.push_back(hvd(h, v, eUP)); }
-
-		int notfree = 0;
-		for (hvd& hvd : directions)
-		{
-			if (isValid(x + hvd.h, y + hvd.v, grid))
-			{
-				if (isDestination(x + hvd.h, y + hvd.v, goal))
-				{
-					//Destination found - make path
-					grid.cells[x + hvd.h][y + hvd.v].parentX = x;
-					grid.cells[x + hvd.h][y + hvd.v].parentY = y;
-					destinationFound = true;
-					releaseClosed();
-					return makePath(grid, goal, startIndex);
-				}
-				else if (closed[x + hvd.h][y + hvd.v] == false)
-				{
-					if (grid.cells[x + hvd.h][y + hvd.v].dir == eNONE)
-					{
-						// Set dir
-						setDir(endIndex.x, endIndex.y, x + hvd.h, y + hvd.v, grid);
-						// Update the details of this neighbour node
-						grid.cells[x + hvd.h][y + hvd.v].parentX = x;
-						grid.cells[x + hvd.h][y + hvd.v].parentY = y;
-						grid.cells[x + hvd.h][y + hvd.v].debugType = eOpen;
-						open.emplace_back(grid.cells[x + hvd.h][y + hvd.v]);
-					}
-				}
-			}
-			else
-				notfree++;
-		}*/
-		// None side is free, change dir
-		//if (notfree == directions.size())
-		{
-			//changeKey(grid, x, y);
-			//open.emplace_back(grid.cells[x][y]);
-
-			for (int newX = -1; newX <= 1; newX++) {
-				for (int newY = -1; newY <= 1; newY++) {
-					if (!(newX == 0 && newY == 0))
-						if (isValid(x + newX, y + newY, grid)) {
-							if (isDestination(x + newX, y + newY, goal))
+		for (int newX = -1; newX <= 1; newX++) {
+			for (int newY = -1; newY <= 1; newY++) {
+				if (!(newX == 0 && newY == 0))
+					if (isValid(x + newX, y + newY, grid)) {
+						if (isDestination(x + newX, y + newY, goal))
+						{
+							//Destination found - make path
+							grid.cells[x + newX][y + newY].parentX = x;
+							grid.cells[x + newX][y + newY].parentY = y;
+							releaseClosed();
+							return makePath(grid, goal, startIndex);
+						}
+						else if (closed[x + newX][y + newY] == false)
+						{
+							if (grid.cells[x + newX][y + newY].dir == eNONE)
 							{
-								//Destination found - make path
+								// Set dir
+								setDir(endIndex.x, endIndex.y, x + newX, y + newY, grid);
+								// Update the details of this neighbour node
 								grid.cells[x + newX][y + newY].parentX = x;
 								grid.cells[x + newX][y + newY].parentY = y;
-								destinationFound = true;
-								releaseClosed();
-								return makePath(grid, goal, startIndex);
-							}
-							else if (closed[x + newX][y + newY] == false)
-							{
-								if (grid.cells[x + newX][y + newY].dir == eNONE)
-								{
-									// Set dir
-									setDir(endIndex.x, endIndex.y, x + newX, y + newY, grid);
-									// Update the details of this neighbour node
-									grid.cells[x + newX][y + newY].parentX = x;
-									grid.cells[x + newX][y + newY].parentY = y;
-									grid.cells[x + newX][y + newY].debugType = eOpen;
-									open.emplace_back(grid.cells[x + newX][y + newY]);
-								}
+								grid.cells[x + newX][y + newY].debugType = eOpen;
+								open.emplace_back(grid.cells[x + newX][y + newY]);
 							}
 						}
-				}
+					}
 			}
 		}
 	}
@@ -299,8 +204,6 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 	open.back().parentY = startIndex.y;
 	open.back().debugType = eOpen;
 
-	bool destinationFound = false;
-
 	int x;
 	int y;
 
@@ -309,21 +212,20 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 	while (!open.empty())
 	{
 		Cell cell;
-		// Get the cell with the smallest f value in the open list
-		//do {
-			float temp = FLT_MAX;
-			Path::iterator itCell;
-			for (Path::iterator it = open.begin();
-				it != open.end(); it = next(it)) {
-				Cell n = (*it);
-				if (n.f < temp) {
-					temp = n.f;
-					itCell = it;
-				}
+		float temp = FLT_MAX;
+		float temph = FLT_MAX;
+		Path::iterator itCell;
+		for (Path::iterator it = open.begin();
+			it != open.end(); it = next(it)) {
+			Cell n = (*it);
+			if (n.f == temp? n.h < temph : n.f < temp) {
+				temp = n.f;
+				temph = n.h;
+				itCell = it;
 			}
-			cell = *itCell;
-			open.erase(itCell);
-		//} while (!open .empty() && !isValid(cell.xindex, cell.yindex, grid));
+		}
+		cell = *itCell;
+		open.erase(itCell);
 
 		x = cell.xindex;
 		y = cell.yindex;
@@ -340,7 +242,6 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 						//Destination found - make path
 						grid.cells[x + newX][y + newY].parentX = x;
 						grid.cells[x + newX][y + newY].parentY = y;
-						destinationFound = true;
 
 						for (int i = 0; i < grid.height; i++)
 						{
@@ -357,7 +258,7 @@ Path PathFinding::computeAStart(CellIndex startIndex, CellIndex endIndex, Grid g
 						hNew = calculateH(x + newX, y + newY, dest);
 						fNew = gNew + hNew;
 						// Check if this path is better than the one already present
-						if (grid.cells[x + newX][y + newY].f == FLT_MAX ||
+						if (grid.cells[x + newX][y + newY].f == FLT_MAX || 
 							grid.cells[x + newX][y + newY].f > fNew)
 						{
 							// Update the details of this neighbour node
