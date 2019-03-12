@@ -19,6 +19,9 @@
     <ClCompile Include="MapLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TimeStampOnMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -27,5 +30,6 @@
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="MapLoader.h" />
+    <ClInclude Include="TimeStampOnMap.h" />
   </ItemGroup>
 </Project>

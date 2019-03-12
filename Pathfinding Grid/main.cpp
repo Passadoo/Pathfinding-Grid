@@ -1,8 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "Map.h"
+#include <ctime>
 
 int main()
 {
+	std::srand(static_cast<int>(time(0)));
+
 	Map map;
 	sf::Clock clock;
 	sf::RenderWindow window(sf::VideoMode(1080, 1080), "Pathfinding Grid");

@@ -13,6 +13,8 @@ Map::Map()
 	// Load map
 	MapLoader::loadMap(mGrid, "Assets/map0.png");
 
+	TimeStampOnMap::createTimeStampIterationOnMap(mGrid, "Assets/map0", 100);
+
 	MapLoader::setZoomFactor(mGrid);
 
 	std::cout << "Use Arrow keys to move" << std::endl;

@@ -51,6 +51,7 @@ public:
 		bool found = false;
 		int x = dest.parentX;
 		int y = dest.parentY;
+		usablePath.insert(usablePath.begin(), grid.cells[dest.xindex][dest.yindex]);
 		while (!found)
 		{
 			usablePath.insert(usablePath.begin(), grid.cells[x][y]);
@@ -59,7 +60,7 @@ public:
 			y = t.parentY;
 			t.type = CellType::ePath;
 
-			if (usablePath[0].parentX == startIndex.x && usablePath[0].parentY == startIndex.y)
+			if (usablePath[0].xindex == startIndex.x && usablePath[0].yindex == startIndex.y)
 				found = true;
 		}
 
