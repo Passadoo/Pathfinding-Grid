@@ -68,8 +68,8 @@ void TimeStampOnMap::createTimeStampIterationOnMap(Grid & grid, const std::strin
 		int i = 0;
 		for (double time : tAStar)
 		{
-			file << time << " ms, start [" << randomStartEndCells[i].start.x << "; " << randomStartEndCells[i].start.y << "], end [" << 
-				randomStartEndCells[i].end.x << "; " << randomStartEndCells[i].end.y << "]" << "\n";
+			file << time /*<< " ms, start [" << randomStartEndCells[i].start.x << "; " << randomStartEndCells[i].start.y << "], end [" << 
+				randomStartEndCells[i].end.x << "; " << randomStartEndCells[i].end.y << "]" */<< "\n";
 			i++;
 		}
 
@@ -78,8 +78,8 @@ void TimeStampOnMap::createTimeStampIterationOnMap(Grid & grid, const std::strin
 		i = 0;
 		for (double time : tDirBasedAStar)
 		{
-			file << time << " ms, start [" << randomStartEndCells[i].start.x << "; " << randomStartEndCells[i].start.y << "], end [" <<
-				randomStartEndCells[i].end.x << "; " << randomStartEndCells[i].end.y << "]" << "\n";
+			file << time /*<< " ms, start [" << randomStartEndCells[i].start.x << "; " << randomStartEndCells[i].start.y << "], end [" <<
+				randomStartEndCells[i].end.x << "; " << randomStartEndCells[i].end.y << "]" */<< "\n";
 			i++;
 		}
 

@@ -11,9 +11,10 @@ Map::Map()
 	//mSprite.scale(0.25f, 0.25f);
 
 	// Load map
-	MapLoader::loadMap(mGrid, "Assets/map0.png");
+	std::string path = "Assets/map1";
+	MapLoader::loadMap(mGrid, path + ".png");
 
-	TimeStampOnMap::createTimeStampIterationOnMap(mGrid, "Assets/map0", 100);
+	//TimeStampOnMap::createTimeStampIterationOnMap(mGrid, path, 100);
 
 	MapLoader::setZoomFactor(mGrid);
 
