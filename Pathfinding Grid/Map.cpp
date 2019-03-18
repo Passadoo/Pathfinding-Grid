@@ -14,7 +14,7 @@ Map::Map()
 	std::string path = "Assets/map1";
 	MapLoader::loadMap(mGrid, path + ".png");
 
-	//TimeStampOnMap::createTimeStampIterationOnMap(mGrid, path, 100);
+	TimeStampOnMap::createTimeStampIterationOnMap(mGrid, path, 100);
 
 	MapLoader::setZoomFactor(mGrid);
 
